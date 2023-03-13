@@ -1,0 +1,119 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+struct Node
+{
+    int data;
+    Node *prev;
+    Node *next;
+};
+
+void insert_N(Node *pr, int j)
+{
+    Node *nd = new Node;
+    Node *in_next = pr->next;
+
+    nd->data = j;
+    nd->prev = pr;
+    nd->next = in_next;
+
+    pr->next = nd;
+    in_next->prev = nd;
+
+}
+
+void locate_array(vector<Node*> &arr, Node *h)
+{
+    for (int i = 0; i < arr.size(); ++i) {
+        h = h->next;
+        arr[i] = h;
+    }
+}
+
+Node* binarySearch(vector<Node*> &arr ,int f)
+{
+    int left = 0;
+    int right = arr.size() - 1;
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        if (f == arr[mid]->data) {
+            return arr[mid];
+        }
+        else if (f < arr[mid]->data) {
+            right = mid - 1;
+        }
+        else{
+            left = mid + 1;
+        }
+    }
+    return nullptr;
+}
+
+void remove_N(Node *bye)
+{
+    Node *pr = bye->prev;
+    Node *ne = bye->next;
+
+    pr->next = ne;
+    ne->prev = pr;
+
+    delete bye;
+}
+
+void output(Node *h, Node *t)
+{
+    while (h != t) {
+        cout << h->data << " ";
+        h = h->next;
+    }
+    cout << "\n";
+    return;
+}
+
+int main()
+{
+    int t,n,q;
+    cin >> t;
+    for (int i = 0; i < t; ++i) {
+        cin >> n;
+        Node *head = new Node;
+        Node *tail = new Node;
+
+        head->next = tail;
+        head->prev = NULL;
+        tail->next = NULL;
+        tail->prev = head;
+
+        Node *pr = head;
+
+        vector<Node*> arr(n);
+        for (int j = 0; j < n; ++j) {
+            insert_N(pr, j + 1);
+            pr = pr->next;
+        }
+        locate_array(arr, head);
+        cin >> q;
+        for (int k = 0; k < q; ++k) {
+            string op;
+            int input;
+            cin >> op >> input;
+            Node *mv;
+            mv = binarySearch(arr, input);
+            if (op == "H") {
+                insert_N(head, mv->data);
+                arr[input - 1] = head->next;
+                remove_N(mv);
+            }
+            else {
+                insert_N(tail->prev, mv->data);
+                arr[input - 1] = tail->prev;
+                remove_N(mv);
+            }
+        }
+        output(head->next, tail);
+
+    }
+    return 0;
+}
